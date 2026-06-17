@@ -267,17 +267,17 @@ function createBarriers() {
   const points = curve3D.getSpacedPoints(TRACK_SAMPLES);
   const barrierGeo = new THREE.BoxGeometry(0.4, 1.0, 3.5);
 
-  for (let i = 0; i < TRACK_SAMPLES; i += 3) {
+  for (let i = 0; i < TRACK_SAMPLES; i += 6) {
     const t = i / TRACK_SAMPLES;
     const pt = points[i];
     const tangent = curve3D.getTangent(t);
     const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize();
 
     for (const side of [1, -1]) {
-      const pos = pt.clone().addScaledVector(normal, side * (ROAD_WIDTH / 2 + 0.5));
+      const pos = pt.clone().addScaledVector(normal, side * (ROAD_WIDTH / 2 + 0.8));
       const angle = Math.atan2(tangent.x, tangent.z);
 
-      const useRed = (Math.floor(i / 6) % 2 === 0);
+      const useRed = (Math.floor(i / 12) % 2 === 0);
       const mesh = new THREE.Mesh(barrierGeo, useRed ? stripeMat : barrierMat);
       mesh.position.copy(pos).setY(0.5);
       mesh.rotation.y = angle;
@@ -474,8 +474,8 @@ scene.add(car);
 // ═══════════════════════════════════════════════════════════════
 
 const physics = {
-  x: 0, z: -1,        // position (start at finish line)
-  heading: 0,          // heading angle (radians, 0 = +z direction)
+  x: 0, z: -2,        // position (just before finish line, facing along track)
+  heading: Math.atan2(30, -5),  // face toward second track point (30, -5)
   speed: 0,            // current speed (units/sec)
   maxSpeed: 65,        // top speed
   maxReverse: -20,
@@ -488,7 +488,7 @@ const physics = {
 };
 
 function resetCar() {
-  physics.x = 0; physics.z = -1; physics.heading = 0; physics.speed = 0;
+  physics.x = 0; physics.z = -2; physics.heading = Math.atan2(30, -5); physics.speed = 0;
 }
 
 // ═══════════════════════════════════════════════════════════════
